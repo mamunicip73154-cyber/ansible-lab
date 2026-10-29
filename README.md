@@ -17,7 +17,7 @@
 | ssh_hardening | SSH 安全加固（禁 root/仅密钥/改端口） | 处理 Ubuntu 24.04 ssh.socket 激活机制兼容性 |
 | fail2ban | 暴力破解防护 | 白名单/封禁策略变量化 |
 | zabbix_agent | Zabbix Agent 部署与配置 | Jinja2 模板化配置，多机差异化（Server 白名单/Hostname） |
-| mysql_install | MySQL 全链路交付 | 装包/设密/建库/监控账号/凭据分发一条龙，Vault 管理敏感变量 |
+| installMysql | MySQL 全链路交付 | 装包/设密/建库/监控账号/凭据分发一条龙，Vault 管理敏感变量 |
 
 ## 特性
 
@@ -50,7 +50,7 @@ ansible-playbook health_check.yml -K
 │   ├── ssh_hardening/
 │   ├── fail2ban/
 │   ├── zabbix_agent/
-│   └── mysql_install/
+│   └── installMysql/
 ├── health_check.yml       # 主机体检 playbook
 ├── docs/                  # 部署手册与事故复盘
 └── README.md
