@@ -1,0 +1,8 @@
+---
+- name: Install MySQL
+  hosts: clone140
+  become: true
+  vars:
+    mysql_root_password: "{{ vault_mysql_root_password }}"
+  roles:
+    - installMysql

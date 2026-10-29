@@ -1,0 +1,22 @@
+- name: 安装 zabbix-agent
+  ansible.builtin.apt:
+    name: zabbix-agent
+    state: present
+    update_cache: true
+- name: 确保 Include 目录存在
+  ansible.builtin.file:
+    path: /etc/zabbix/zabbix_agentd.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+
+- name: 部署 zabbix_agentd.conf（模板化）
+  ansible.builtin.template:
+    src: zabbix_agentd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: 重启 zabbix-agent

@@ -1,0 +1,6 @@
+---
+- name: 部署 zabbix-agent
+  hosts: zabbix_agents
+  become: true
+  roles:
+    - zabbix_agent

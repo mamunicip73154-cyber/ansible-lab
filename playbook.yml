@@ -1,0 +1,18 @@
+---
+- name: 双机基础配置练习
+  hosts: zabbix_agents
+  become: true                 # 用 sudo 执行（被管机的 ubuntu 有 sudo 密码）
+
+  tasks:
+    - name: 确认 htop 已安装
+      ansible.builtin.apt:
+        name: htop
+        state: present
+
+    - name: 写一个标识文件
+      ansible.builtin.copy:
+        content: "managed by ansible on {{ inventory_hostname }}\n"
+        dest: /etc/ansible-managed
+        owner: root
+        group: root
+        mode: "0644"

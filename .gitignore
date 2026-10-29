@@ -1,0 +1,9 @@
+# 敏感信息绝不进仓库
+group_vars/all/vault.yml
+.vault_pass
+~/.vault_pass
+
+# 备份与临时文件
+*.bak.*
+*.retry
+*.swp

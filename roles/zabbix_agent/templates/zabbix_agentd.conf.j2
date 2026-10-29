@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+# Zabbix Agent 配置 - 由 Ansible 管理，手改会被覆盖
+
+PidFile=/run/zabbix/zabbix_agentd.pid
+LogFile=/var/log/zabbix/zabbix_agentd.log
+LogFileSize=0
+Server={{ zabbix_allowed_servers }}
+ServerActive={{ zabbix_allowed_servers }}
+Hostname={{ zabbix_agent_hostname | default(inventory_hostname) }}
+Include=/etc/zabbix/zabbix_agentd.conf.d/*.conf

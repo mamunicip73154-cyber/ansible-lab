@@ -1,0 +1,39 @@
+---
+- name: 主机体检
+  hosts: ubuntu139,clone140
+  become: true
+  vars:
+    check_services:
+      - zabbix-agent
+      - mysql
+      - nginx
+
+  tasks:
+    # ① loop：批量查服务状态
+
+
+    - name: 服务体检（不存在的报 not-installed）
+      ansible.builtin.shell: |
+        if systemctl list-unit-files {{ item }}.service --no-legend | grep -q .; then
+          systemctl is-active {{ item }}
+        else
+         echo "not-installed"
+        fi
+      loop: "{{ check_services }}"
+      register: service_results
+      changed_when: false
+
+    # ② register + when：根据上一步结果做判断
+    - name: 汇总异常服务
+      ansible.builtin.debug:
+       msg: "{{ item.item }} 在 {{ inventory_hostname }} 上状态异常：{{ item.stdout }}"
+      loop: "{{ service_results.results }}"
+      when: item.stdout != 'active'    # active 以外的一切都报：inactive / not-installed / failed
+      loop_control:
+        label: "{{ item.item }}"
+    # ③ failed_when：自定义失败判定
+    - name: 检查磁盘占用
+      ansible.builtin.shell: "df -h / | tail -1 | awk '{print $5}' | tr -d '%'"
+      register: disk_usage
+      changed_when: false
+      failed_when: disk_usage.stdout | int > 90   # 用量超90%才判失败

@@ -1,0 +1,30 @@
+- name: 设置 SSH 监听端口
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?\s*Port'
+    line: 'Port {{ssh_port}}'
+  notify: 重启 sshd
+- name: 关闭密码登录
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?\s*PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+  notify: 重启 sshd
+
+- name: 关闭 root 登录
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?\s*PermitRootLogin'
+    line: 'PermitRootLogin no'
+  notify: 重启 sshd
+- name: 禁用 SSH socket 激活（Ubuntu 24.04 会架空 sshd_config 的 Port 配置）
+  ansible.builtin.systemd:
+    name: ssh.socket
+    enabled: false
+    state: stopped
+
+- name: 确保传统 sshd 服务运行且开机自启
+  ansible.builtin.systemd:
+    name: ssh
+    enabled: true
+    state: started

@@ -1,0 +1,7 @@
+---
+- name: SSH 加固（阶段一：禁密码 + fail2ban，不改端口）
+  hosts: clone140
+  become: true
+  roles:
+    - ssh_hardening
+    - fail2ban

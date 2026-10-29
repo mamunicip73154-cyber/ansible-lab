@@ -1,0 +1,20 @@
+- name: 安装 fail2ban
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+    update_cache: true
+- name: 配置 fail2ban
+  ansible.builtin.copy:
+    dest: /etc/fail2ban/jail.local
+    mode: '0644'
+    content: |
+      [DEFAULT]
+      ignoreip = 127.0.0.1/8 192.168.52.139
+      bantime = 1h
+      findtime = 10m
+      maxretry = 5
+
+      [sshd]
+      enabled = true
+      port = {{ssh_port}}
+  notify: 重启 fail2ban

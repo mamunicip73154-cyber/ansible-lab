@@ -1,0 +1,5 @@
+- name: 重启 zabbix-agent 服务
+  ansible.builtin.systemd:
+    name: zabbix-agent
+    state: restarted
+    enabled: true

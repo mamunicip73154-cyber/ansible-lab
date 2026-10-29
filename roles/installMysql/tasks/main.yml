@@ -1,0 +1,67 @@
+- name: Install python3-mysqldb package
+  ansible.builtin.apt:
+    name: python3-mysqldb
+    state: present
+    update_cache: true
+
+- name: Install MySQL server
+  ansible.builtin.apt:
+    name: mysql-server
+    state: present
+    update_cache: true
+
+- name: Ensure MySQL service is running and enabled
+  ansible.builtin.service:
+    name: mysql
+    state: started
+    enabled: true
+
+- name: Set MySQL root password
+  community.mysql.mysql_user:
+    login_user: root
+    login_unix_socket: "{{ mysql_socket }}"
+    login_password: "{{ mysql_root_password }}"   # ← 补上（密码已设的情况下模块也要凭密码连）
+    name: root
+    password: "{{ mysql_root_password }}"
+    host_all: true
+    state: present
+  no_log: true
+
+- name: Create a database
+  community.mysql.mysql_db:
+    name: "{{ mysql_db_name }}"
+    state: present
+    login_user: root
+    login_unix_socket: "{{ mysql_socket }}"
+    login_password: "{{ mysql_root_password }}"
+  no_log: true
+- name: Create Zabbix agent database
+  community.mysql.mysql_user:
+    login_user: root
+    login_unix_socket: "{{ mysql_socket }}"
+    login_password: "{{ mysql_root_password }}"
+    name: "{{ mysql_monitor_user }}"
+    host: localhost
+    password: "{{ vault_zbx_monitor_password }}"
+    priv: "*.*:PROCESS,REPLICATION CLIENT,SELECT"
+    state: present
+  no_log: true
+
+- name: 激活 userparameter
+  ansible.builtin.copy:
+    src: /usr/share/doc/zabbix-agent/userparameter_mysql.conf
+    dest: /etc/zabbix/zabbix_agentd.conf.d/
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0644'
+  notify: 重启 zabbix-agent 服务
+
+- name: Zabbix配置文件写入
+  ansible.builtin.template:
+    src: mysql.conf.j2
+    dest: /var/lib/zabbix/.my.cnf
+    owner: zabbix
+    group: zabbix
+    mode: '0600'
+  notify: 重启 zabbix-agent 服务
